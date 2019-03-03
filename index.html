@@ -6,7 +6,7 @@
 integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
 crossorigin=""/>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="style.css">
 
 <html>
 <script src ="index.js"></script>
@@ -18,23 +18,22 @@ crossorigin=""/>
     <!-- <link rel='stylesheet' href='/stylesheets/style.css' /> -->
   </head>
   <body>
-    <h1>FAST</h1>
-    <div id ="test"></div>
-    <div id="mapid" style="height:500px;"></div>
+    <h1 style="text-align: center;">FAST</h1>
+    <div id="mapid" style="height:800px;"></div>
   </body>
   <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"
   integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
   crossorigin=""></script>
   <script>
       function getColor(d) {
-        return d > 1000 ? '#800026' :
-            d > 500  ? '#BD0026' :
-            d > 200  ? '#E31A1C' :
-            d > 100  ? '#FC4E2A' :
-            d > 50   ? '#FD8D3C' :
-            d > 20   ? '#FEB24C' :
-            d > 10   ? '#FED976' :
-                        '#FFEDA0';
+        return d > 1000 ? '#230C33' :
+            d > 500  ? '#5F4E6A' :
+            d > 200  ? '#311A48' :
+            d > 100  ? '#957AB0' :
+            d > 50   ? '#6F5C86' :
+            d > 20   ? '#877A8F' :
+            d > 10   ? '#624438' :
+                        '#AFA6B4';
         }
         function style(feature) {
             return {
@@ -79,29 +78,77 @@ crossorigin=""/>
                 mouseout: resetHighlight,
                 // click: click
             })
+            var prep = feature.properties.precipitation;
+            var sun = feature.properties.sunshine;
+            var temp = feature.properties.temperature;
+            var area = feature.properties.harvest;
+            var prod = feature.properties.prediction;
             var elementpop = 
-            '<div><h4>'+feature.properties.name+'</h4>\
-                <div class="row">\
-                        <h5 class="col" >rain:</h5>\
-                        <div class="col"><input type="text" id="rain_edit" class="form-control" placeholder="inch" style="display:none;"></div>\
-                        <h5 class="col">inch</h5>\
+            '<div class="container">\
+                <h4>'+feature.properties.name+'</h4>\
+                <div style="flex-direction: row; display: flex; align-items: center;">\
+                    <p><b>RAIN:</b></p>\
+                    <div><input type="text" id="rain_edit" style="width:80px;" class="form-control" value="' + prep + '" disabled></div>\
+                    <p>inch</p>\
                 </div>\
-                <div class="row"><p>sun:%</p></div>\
-                <div class="row"><p>temperature:F</p></div>\
-                <div class="row"><p>area:acres</p></div>\
-                <button type="button" class="btn btn-outline-primary" onClick=clickButton()>Edit</button></div>';
+                <div style="flex-direction: row; display: flex; align-items: center;">\
+                    <p><b>SUN:</b></p>\
+                    <div><input type="text" id="sun_edit" style="width:80px;" class="form-control" value="' + sun + '" disabled></div>\
+                    <p>%</p>\
+                </div>\
+                <div style="flex-direction: row; display: flex; align-items: center;">\
+                    <p><b>TEMPERATURE:</b></p>\
+                    <div><input type="text" id="temp_edit" style="width:80px;" class="form-control" value="' + temp + '" disabled></div>\
+                    <p>F</p>\
+                </div>\
+                <div style="flex-direction: row; display: flex; align-items: center;">\
+                    <p><b>AREA:</b></p>\
+                    <div><input type="text" id="area_edit" style="width:80px;" class="form-control" value="' + area + '" disabled></div>\
+                    <p>acres</p>\
+                </div>\
+                <hr>\
+                <div style="flex-direction: row; display: flex; align-items: center;">\
+                    <p><b>PRODUCTION:</b></p>\
+                    <div><input type="text" id="produ_edit" style="width:80px;" class="form-control" value="' + prod + '" disabled></div>\
+                    <p>bu</p>\
+                </div>\
+                <div class="row" style="flex-direction: row; display: flex; align-items: center;justify-content: center;"><button type="button" class="btn btn-outline-primary" id="button-edit" onClick=clickButton()>Edit</button></div>\
+            \</div>';
 
             layer.bindPopup(elementpop);
+            $('#button-edit').click(function(){
+
+                $.ajax({
+                    url:"/gb",
+                    success: function(data) {
+                        console.log(response.data);
+                    },
+                    error: function(request, status, error) {
+                        console.log("fail");
+                    }
+                });
+            });
         }
 
         var toggleedit = false;
         function clickButton() {
             toggleedit = !toggleedit;
             var rainEdit = document.getElementById("rain_edit");
+            var sunEdit = document.getElementById("sun_edit");
+            var tempEdit = document.getElementById("temp_edit");
+            var areaEdit = document.getElementById("area_edit");
             if (toggleedit) {
-                rainEdit.style.display = "block";
+                rainEdit.disabled = false;
+                sunEdit.disabled = false;
+                tempEdit.disabled = false;
+                areaEdit.disabled = false;
+                // rainEdit.style.display = "block";
             } else {
-                rainEdit.style.display = "none";
+                // rainEdit.style.display = "none";
+                rainEdit.disabled = true;
+                sunEdit.disabled = true;
+                tempEdit.disabled = true;
+                areaEdit.disabled = true;
             }
         }
         
