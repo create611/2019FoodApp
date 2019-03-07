@@ -5,8 +5,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
 
-depth = 5
+depth = 2
 
+# tr is training dataset
 data = pd.read_csv("tr.csv",header=0)
 data= data.drop([data.columns[0]],axis=1)
 
@@ -33,14 +34,24 @@ bestn = np.argmin(errors)
 gb2=GradientBoostingRegressor(max_depth=depth,n_estimators=bestn,learning_rate=0.1)
 gb2.fit(feat,label)
 
+# final and yy contains the original data for testing
 final = pd.read_csv("corn.csv",header=0)
-
+yy = pd.read_csv("corn_data.csv",header=0)
+yreal = yy['production ']
+'''
 test = pd.read_csv("td.csv",header=0)
 test = test.drop([test.columns[0]],axis=1)
 tlabel= test['prod']
-tfeat= test[test.columns[1:]]
+tfeat= test[test.columns[1:]]'''
+
+# y2 is the output production array
 y2 = gb2.predict(final[final.columns[1:5]])
     
+#histogram
+plt.hist(np.abs(y2-yreal)/yreal,bins= 10)
+plt.title('Histogram of prediction precision')
+plt.ylabel('Occupancy')
+plt.xlabel('Precision')
 
 final['prediction'] = pd.Series(y2, index=final.index)
 final.to_csv('final.csv')
